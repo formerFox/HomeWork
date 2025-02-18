@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForCheck", "ForCheck\ForCheck.csproj", "{845757A9-335C-4BFF-8F85-1597EC7DF162}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{845757A9-335C-4BFF-8F85-1597EC7DF162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{845757A9-335C-4BFF-8F85-1597EC7DF162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{845757A9-335C-4BFF-8F85-1597EC7DF162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{845757A9-335C-4BFF-8F85-1597EC7DF162}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B8E817F-26AD-4A05-A938-43342BB59E50}
+	EndGlobalSection
+EndGlobal
