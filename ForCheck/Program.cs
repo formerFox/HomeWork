@@ -4,6 +4,12 @@ bool havingPet = false;
 int size = 38;
 Console.WriteLine($"My name - {name}");
 Console.WriteLine($"I'm {age} years");
-Console.WriteLine($"Do i have a pat? {havingPet} ");
+Console.WriteLine($"Do i have a pat? {havingPet}");
 Console.WriteLine($"My foot size - {size}");
 Console.ReadKey();
+enum TrafficLightColor :int
+{ 
+    Red = 100,
+    Yellow = 200,
+    Green = 300
+}
