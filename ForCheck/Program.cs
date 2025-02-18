@@ -1,22 +1,19 @@
-﻿string name = "Chris";
-byte age = 26;
-bool havingPet = false;
-int size = 38;
-Console.WriteLine($"My name - {name}");
-Console.WriteLine($"I'm {age} years");
-Console.WriteLine($"Do i have a pat? {havingPet}");
-Console.WriteLine($"My foot size - {size}");
-//Console.ReadKey();
+﻿Console.Write("Your name - ");
+string name = Console.ReadLine();
+Console.Write("Age - ");
+byte age = (byte)int.Parse(Console.ReadLine());
+Console.WriteLine($"Your name - {name} and age is {age}");
+Console.Write("What is your favorite day of week?(number)");
+DayOfWeek day = (DayOfWeek)int.Parse(Console.ReadLine());
+Console.WriteLine($"Your favorite day is - {day}");
 
-double result = (double)5 / 2;
-Console.WriteLine("5 / 2 = {0}", result);
-
-result = 10 % 3;
-Console.WriteLine(result);
-
-enum TrafficLightColor : int
+enum DayOfWeek : byte
 {
-    Red = 100,
-    Yellow = 200,
-    Green = 300
+    Monday = 1,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday
 }
