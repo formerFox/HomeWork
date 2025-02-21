@@ -1,8 +1,15 @@
-﻿var arr = new int[] { 5, 6, 9, 1, 2, 3, 4 };
-var summ = 0;
+﻿var arr = new int[10];
+Random random = new Random();
 for (int i = 0; i < arr.Length; i++)
 {
-       summ += arr[i];
+    arr[i] = random.Next(-10, 11);
+    Console.WriteLine($"arr[{i}] = {arr[i]}");
 }
 
-Console.WriteLine(summ);
+var count = 0;
+for (int i = 0; i < arr.Length; i++)
+{      if (arr[i] > 0)
+        count++;
+}
+
+Console.WriteLine($" количество положительных элементов = {count}");
