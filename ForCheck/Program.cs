@@ -1,84 +1,39 @@
-﻿using System;
+﻿//6.6.2
+using System.Xml.Linq;
+using System;
 
-static (string name, string surname, int age, bool havePets, List<string> petNames, List<string> colors) GetPersonInfo()
+class User
 {
+    private int age;
+    private string login;
+    private string mail;
 
-    Console.WriteLine("Введите имя:");
-    string name = Console.ReadLine();
-
-    Console.WriteLine("Введите фамилию:");
-    string surname = Console.ReadLine();
-
-    int age = 0;
-    while (true)
+    public int Age
     {
-        Console.WriteLine("Введите возраст:");
-        string? ageInput = Console.ReadLine();
-        if (int.TryParse(ageInput, out age) && age > 0) break;
-        else Console.WriteLine("Некорректный возраст, попробуйте еще раз!");
-    }
+        get { return age; }
 
-    Console.WriteLine("У вас есть питомцы(да/нет):");
-    string petInput = Console.ReadLine();
-    bool havePets = petInput.ToUpper() == "ДА" || petInput.ToUpper() == "YES";
-
-    List<string> petNames = new List<string>();
-
-    //метод в методе
-    void checkList(string a, string b, List<string> list)
-    {
-        while (true)
+        set
         {
-            Console.WriteLine(a);
-            string? countInput = Console.ReadLine();
-            if (int.TryParse(countInput, out int count) && count > 0)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    Console.WriteLine(b);
-                    list.Add(Console.ReadLine());
-                }
-                break;
-            }
-            else Console.WriteLine("Некорректно введено число, попробуйте еще раз!");
+            if (value < 18) Console.WriteLine("Возраст должен быть не меньше 18");
+            else age = value;
         }
-
     }
-
-    if (havePets)
+    public string Login
     {
-        checkList("Сколько питомцев:", "Имя питомца:", petNames);
+        get { return login; }
+        set
+        {
+            if (string.IsNullOrEmpty(value) || value.Length < 3) Console.WriteLine("Login должен быть не менее 3 символов");
+            else login = value;
+        }
     }
-
-    List<string> colors = new List<string>();
-    checkList("Сколько любимых цветов:", "Любимый цвет:", colors);
-
-    return (name, surname, age, havePets, petNames, colors);
-}
-
-//Использование
-(string name, string surname, int age, bool hasPets, List<string> petNames, List<string> colors) personInfo = GetPersonInfo();
-
-Console.WriteLine($"Имя: {personInfo.name}");
-Console.WriteLine($"Фамилия: {personInfo.surname}");
-Console.WriteLine($"Возраст: {personInfo.age}");
-
-Console.WriteLine($"Есть питомцы: {(personInfo.hasPets ? "Да" : "Нет")}");
-
-if (personInfo.hasPets)
-{
-    Console.WriteLine("Имена питомцев:");
-    foreach (string petName in personInfo.petNames)
+    public string Mail
     {
-        Console.WriteLine(petName);
-    }
-}
-
-if (personInfo.colors.Count > 0)
-{
-    Console.WriteLine("Любимые цвета:");
-    foreach (string color in personInfo.colors)
-    {
-        Console.WriteLine(color);
+        get { return mail; }
+        set
+        {
+            if (!string.IsNullOrEmpty(value) && !value.Contains("@")) Console.WriteLine("Почта не соответствует Почта не соответствует формату");
+            else login = value;
+        }
     }
 }
