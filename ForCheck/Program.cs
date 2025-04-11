@@ -1,137 +1,133 @@
-﻿using System.Text.RegularExpressions;
-//слишком абстрактное задание
-abstract class Delivery<T>
-{
-    public ForAdress<T> adress = new ForAdress<T>();//агрегация
+﻿//Задание 1
 
-    public virtual void Print() 
-    {
-        Console.WriteLine("Доставка");
-    }
-    protected abstract void Info();
+// Определяем собственный тип исключения
+public class MyCustomException : Exception
+{
+    public MyCustomException(string message) : base(message) { }
 }
 
-class ForAdress <T>
+class Program
 {
-    private T adress;
-    public T Adress 
+    static void Main(string[] args)
     {
-        get => adress; 
-        set => adress = value;
+
+        //Задание 1
+
+        // Создаем массив с пятью различными исключениями
+        Exception[] exceptions = new Exception[]
+        {
+                new ArgumentNullException("Сообщение об ошибке ArgumentNullException."),
+                new DivideByZeroException("Сообщение об ошибке DivideByZeroException."),
+                new InvalidOperationException("Сообщение об ошибке InvalidOperationException."),
+                new IndexOutOfRangeException("Сообщение об ошибке IndexOutOfRangeException."),
+                new MyCustomException("Собственное исключение.")
+        };
+
+        // Обрабатываем каждый тип исключения с помощью блока Try-Catch-Finally
+        foreach (var ex in exceptions)
+        {
+            try
+            {
+                // Искусственно вызываем исключение
+                throw ex;
+            }
+            catch (MyCustomException customEx)
+            {
+                Console.WriteLine($"{customEx.Message}");
+            }
+            catch (ArgumentNullException argNullEx)
+            {
+                Console.WriteLine($"{argNullEx.Message}");
+            }
+            catch (DivideByZeroException divideByZeroEx)
+            {
+                Console.WriteLine($"{divideByZeroEx.Message}");
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                Console.WriteLine($"{invalidOpEx.Message}");
+            }
+            catch (IndexOutOfRangeException indexOutEx)
+            {
+                Console.WriteLine($"{indexOutEx.Message}");
+            }
+            /*finally
+            {
+                Console.WriteLine("Finally block executed.\n");
+            }*/
+        }
+
+        //Задание 2
+        List<string> surnames = new List<string>
+        {
+            "Петров",
+            "Иванов",
+            "Сидоров",
+            "Кузнецов",
+            "Алексеев"
+        };
+
+        Sorter sorter = new Sorter();
+        sorter.SortEvent += (sortedSurnames) =>
+        {
+            Console.WriteLine("Фамилии отсортированы:");
+            foreach (var surname in sortedSurnames)
+            {
+                Console.WriteLine(surname);
+            }
+        };
+
+        try
+        {
+            sorter.SortList(surnames);
+        }
+        catch (MyCustomException customEx)
+        {
+            Console.WriteLine($"{customEx.Message}");
+        }
+
     }
 }
 
-class User
+
+//Задание 2
+
+// Делегат для события сортировки фамилий
+public delegate void SortEventHandler(List<string> surnames);
+class Sorter
 {
-    public string nameUser{  get; set; }//автосвойства
-    public string numberUser {  get; set; }
-    public string pickPoint {  get; set; }
-    public string shop {  get; set; }
-    public int count;
-    public int Count{ //добавление логики в свойства 
-        get => count; 
-        set 
-        { 
-            if (value < 0)
-                throw new ArgumentException("Некорректный ввод!");
-            count = value;
-        } 
-    }
-    public User() { }
-    public User(string nameUser, string numberUser) : this()
-    { 
-        this.nameUser = nameUser;
-        this.numberUser = numberUser;
-    }
-    public User(string pickPoint) 
-    { 
-        this.pickPoint = pickPoint;
-    }
-    public User(string shop, int count)
+    // Событие для сортировки
+    public event SortEventHandler SortEvent;
+
+    public void SortList(List<string> list)
     {
-        this.shop = shop;
-        this.count = count;
+        int choice = 0; // по умолчанию
+        while (true)
+        {
+            Console.WriteLine($"Если хотите отсортировать от А до Я - введите 1, от Я до А - 2:");
+            string? count = Console.ReadLine();
+            if (int.TryParse(count, out choice) && choice == 1 || choice == 2) break;
+            else Console.WriteLine("Некорректный ввод! Пожалуйста, введите число 1 или 2.");
+        }
+
+        if (list != null)
+            switch (choice)
+            {
+                case 1:
+                    Console.WriteLine($"Выбрана сортировка от А до Я!");
+                    list.Sort();
+                    foreach (var item in list) Console.WriteLine(item.ToString());
+                    break;
+                case 2:
+                    Console.WriteLine($"Выбрана сортировка от Я до А!");
+                    list.Sort();
+                    list.Reverse();
+                    foreach (var item in list) Console.WriteLine(item.ToString());
+                    break;
+            };
+
+        Console.WriteLine($"");
     }
 }
 
-class HomeDelivery : Delivery<string> //Наследование
-{
-    User user = new User();//Композиция
-    public HomeDelivery() { }
-    public HomeDelivery(string nameUser, string numberUser) //Конструктор с параметрами
-    {
-        user.nameUser = nameUser;
-        user.numberUser = numberUser;
-    }
-    private string Number() //Инкапсуляция...
-    {
-        string pattern = @"\D";
-        string target = "";
-        Regex regex = new Regex(pattern);
-        string result = regex.Replace(user.numberUser, target);
-        return result;
-    }
-    public override void Print()
-    {
-        Console.WriteLine("Доставка на дом");
-    }
-    protected override void Info() 
-    {
-        Console.WriteLine($"Имя покупателя: {user.nameUser} \n Номер покупателя: {Number()}");//...Инкапсуляция
-    }
-}
-
-class PickPointDelivery : Delivery<int>
-{
-    User user = new User();//Композиция
-    public PickPointDelivery(string pickPoint) 
-    {   
-        user.pickPoint = pickPoint;
-    }
-    public override void Print()
-    {
-        Console.WriteLine("Доставка в пункт выдачи");
-    }
-    protected override void Info() { }
-}
-
-class ShopDelivery : Delivery<string>
-{
-    User user = new User();//Композиция
-    public ShopDelivery(string shop, int count) 
-    { 
-        user.shop = shop;
-        user.count = count;
-    }
-    public override void Print()
-    {
-        Console.WriteLine("Доставка в розничный магазин");
-    }
-    protected override void Info() { }
-}
-
-class Order<TDelivery,TStruct> where TDelivery : Delivery<string>//Обобщение...
-{
-    public TDelivery Delivery;//...обобщение
-
-    public int Number;
-
-    public string Description;
-
-    public void DisplayAddress()
-    {
-        Console.WriteLine(Delivery.adress);
-    }
-
-    
-}
-
-public class Programm
-{
-    static void Main() 
-    {
-        Delivery<string> home = new HomeDelivery();//Полиморфизм
-        home.Print();
-    }
-}
 
