@@ -1,133 +1,137 @@
-﻿//Задание 1
-
-// Определяем собственный тип исключения
-public class MyCustomException : Exception
+﻿using System;
+using static System.Console;
+// Интерфейс логгера
+interface ILogger
 {
-    public MyCustomException(string message) : base(message) { }
+    void LogEvent(string message);
+    void LogError(string message);
 }
+
+// Реализация логгера с цветным выводом
+class ConsoleLogger : ILogger
+{
+    public void LogEvent(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine($"[EVENT] {DateTime.Now}: {message}");
+        Console.ResetColor();
+    }
+
+    public void LogError(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"[ERROR] {DateTime.Now}: {message}");
+        Console.ResetColor();
+    }
+}
+
+interface ICalculator
+{
+    int Addition(int a, int b);
+    int Subtraction(int a, int b);
+    int Multiplication(int a, int b);
+    int Division(int a, int b);
+}
+
+class Calculator : ICalculator
+{
+    private readonly ILogger _logger;
+
+    // Внедрение зависимости через конструктор
+    public Calculator(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public int Addition(int a, int b)
+    {
+        int result = a + b;
+        _logger.LogEvent($"{a} + {b} = {result}");
+        return result;
+    }
+
+    public int Subtraction(int a, int b)
+    {
+        int result = a - b;
+        _logger.LogEvent($"{a} - {b} = {result}");
+        return result;
+    }
+
+    public int Multiplication(int a, int b)
+    {
+        int result = a * b;
+        _logger.LogEvent($"{a} * {b} = {result}");
+        return result;
+    }
+
+    public int Division(int a, int b)
+    {
+        if (b == 0)
+        {
+            _logger.LogError($"Division by zero attempted: {a} / {b}");
+            throw new DivideByZeroException("Division by zero is not allowed.");
+        }
+
+        int result = a / b;
+        _logger.LogEvent($"{a} / {b} = {result}");
+        return result;
+    }
+}
+
+delegate int Operation(int x, int y);
 
 class Program
 {
     static void Main(string[] args)
     {
-
-        //Задание 1
-
-        // Создаем массив с пятью различными исключениями
-        Exception[] exceptions = new Exception[]
-        {
-                new ArgumentNullException("Сообщение об ошибке ArgumentNullException."),
-                new DivideByZeroException("Сообщение об ошибке DivideByZeroException."),
-                new InvalidOperationException("Сообщение об ошибке InvalidOperationException."),
-                new IndexOutOfRangeException("Сообщение об ошибке IndexOutOfRangeException."),
-                new MyCustomException("Собственное исключение.")
-        };
-
-        // Обрабатываем каждый тип исключения с помощью блока Try-Catch-Finally
-        foreach (var ex in exceptions)
+        // Создаем логгер и внедряем его в калькулятор
+        ILogger logger = new ConsoleLogger();
+        Calculator calculator = new Calculator(logger);
+        Console.WriteLine("Введите выражение (например 5 + 3) с целыми числами или 'exit' для выхода:");
+        while (true)
         {
             try
             {
-                // Искусственно вызываем исключение
-                throw ex;
+
+                string input = Console.ReadLine();
+
+                if (input.ToLower() == "exit")
+                    break;
+
+                string[] parts = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length != 3)
+                {
+                    logger.LogError("Invalid input format. Use: number operator number");
+                    Console.WriteLine("Неправильный формат ввода. Используйте формат: ЧИСЛО оператор ЧИСЛО");
+                    continue;
+                }
+
+                if (!int.TryParse(parts[0], out int a) || !int.TryParse(parts[2], out int b))
+                {
+                    logger.LogError("One or both operands are not integers");
+                    Console.WriteLine("Ошибка: оба операнда должны быть целыми числами");
+                    continue;
+                }
+
+                Operation op = parts[1] switch
+                {
+                    "+" => calculator.Addition,
+                    "-" => calculator.Subtraction,
+                    "*" => calculator.Multiplication,
+                    "/" => calculator.Division,
+                    _ => throw new ArgumentException("Неизвестная операция. Допустимые операции: +, -, *, /")
+                };
+
+                int result = op(a, b);
+                Console.WriteLine($"Результат: {result}");
             }
-            catch (MyCustomException customEx)
+            catch (Exception ex)
             {
-                Console.WriteLine($"{customEx.Message}");
+                logger.LogError(ex.Message);
+                WriteLine($"Ошибка: {ex.Message}");
             }
-            catch (ArgumentNullException argNullEx)
-            {
-                Console.WriteLine($"{argNullEx.Message}");
-            }
-            catch (DivideByZeroException divideByZeroEx)
-            {
-                Console.WriteLine($"{divideByZeroEx.Message}");
-            }
-            catch (InvalidOperationException invalidOpEx)
-            {
-                Console.WriteLine($"{invalidOpEx.Message}");
-            }
-            catch (IndexOutOfRangeException indexOutEx)
-            {
-                Console.WriteLine($"{indexOutEx.Message}");
-            }
-            /*finally
-            {
-                Console.WriteLine("Finally block executed.\n");
-            }*/
+
         }
-
-        //Задание 2
-        List<string> surnames = new List<string>
-        {
-            "Петров",
-            "Иванов",
-            "Сидоров",
-            "Кузнецов",
-            "Алексеев"
-        };
-
-        Sorter sorter = new Sorter();
-        sorter.SortEvent += (sortedSurnames) =>
-        {
-            Console.WriteLine("Фамилии отсортированы:");
-            foreach (var surname in sortedSurnames)
-            {
-                Console.WriteLine(surname);
-            }
-        };
-
-        try
-        {
-            sorter.SortList(surnames);
-        }
-        catch (MyCustomException customEx)
-        {
-            Console.WriteLine($"{customEx.Message}");
-        }
-
     }
 }
-
-
-//Задание 2
-
-// Делегат для события сортировки фамилий
-public delegate void SortEventHandler(List<string> surnames);
-class Sorter
-{
-    // Событие для сортировки
-    public event SortEventHandler SortEvent;
-
-    public void SortList(List<string> list)
-    {
-        int choice = 0; // по умолчанию
-        while (true)
-        {
-            Console.WriteLine($"Если хотите отсортировать от А до Я - введите 1, от Я до А - 2:");
-            string? count = Console.ReadLine();
-            if (int.TryParse(count, out choice) && choice == 1 || choice == 2) break;
-            else Console.WriteLine("Некорректный ввод! Пожалуйста, введите число 1 или 2.");
-        }
-
-        if (list != null)
-            switch (choice)
-            {
-                case 1:
-                    Console.WriteLine($"Выбрана сортировка от А до Я!");
-                    list.Sort();
-                    foreach (var item in list) Console.WriteLine(item.ToString());
-                    break;
-                case 2:
-                    Console.WriteLine($"Выбрана сортировка от Я до А!");
-                    list.Sort();
-                    list.Reverse();
-                    foreach (var item in list) Console.WriteLine(item.ToString());
-                    break;
-            };
-
-        Console.WriteLine($"");
-    }
-}
-
-
